@@ -7,10 +7,12 @@ namespace App\Interface;
 interface PaymentInterface
 {
     /**
+     * Оплата товара.
+     *
      * @param string $processor имя процессора для платежа
-     * @param mixed  $price
+     * @param float  $price     цена продукта
      *
      * @return bool
      */
-    public function payment(string $processor, mixed $price): bool;
+    public function payment(string $processor, float $price): bool;
 }

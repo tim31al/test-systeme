@@ -1,10 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Tests\Functional\Validator;
 
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
-class ClientDataValidator extends KernelTestCase
+class ClientDataValidatorTest extends KernelTestCase
 {
     public function testValidPrice(): void
     {
@@ -41,6 +43,19 @@ class ClientDataValidator extends KernelTestCase
 
         $this->assertArrayHasKey('product', $errors);
         $this->assertCount(1, $errors['product']);
+    }
+
+    public function testNotValidWithNullData(): void
+    {
+        self::bootKernel();
+
+        /** @var \App\Validator\ClientDataValidator $validator */
+        $validator = static::getContainer()->get('test.Validator');
+
+        $data = null;
+
+        $errors = $validator->validate($data);
+        $this->assertCount(2, $errors);
     }
 
     public function testValidPurchase(): void

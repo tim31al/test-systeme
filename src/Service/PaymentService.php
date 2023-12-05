@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace App\Service;
 
 use App\Interface\PaymentInterface;
-use Exception;
 use LogicException;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Systemeio\TestForCandidates\PaymentProcessor\PaypalPaymentProcessor;
@@ -24,12 +23,9 @@ class PaymentService implements PaymentInterface
     }
 
     /**
-     * @param string $processor
-     * @param mixed  $price
-     *
-     * @throws Exception
+     * @throws \Exception
      */
-    public function payment(string $processor, mixed $price): bool
+    public function payment(string $processor, float $price): bool
     {
         if (!$this->support($processor)) {
             throw new LogicException(sprintf('Processor "%s" not found.', $processor));
@@ -38,9 +34,7 @@ class PaymentService implements PaymentInterface
         $runner = $this->container->get($processor);
 
         if ($runner instanceof PaypalPaymentProcessor) {
-            if (!is_int($price)) {
-                throw new LogicException(sprintf('Processor "%s" require int price.', $processor));
-            }
+            $price = (int) ($price * 100);
 
             $runner->pay($price);
 
@@ -48,10 +42,6 @@ class PaymentService implements PaymentInterface
         }
 
         if ($runner instanceof StripePaymentProcessor) {
-            if (!is_float($price)) {
-                throw new LogicException(sprintf('Processor "%s" require float price.', $processor));
-            }
-
             return $runner->processPayment($price);
         }
 
@@ -62,6 +52,8 @@ class PaymentService implements PaymentInterface
      * Поддерживаемые типы процессоров.
      *
      * @param string $processor
+     *
+     * @return bool
      */
     private function support(string $processor): bool
     {

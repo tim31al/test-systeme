@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Tests\Functional\Service;
 
 use Exception;
@@ -28,8 +30,9 @@ class PaymentServiceTest extends KernelTestCase
         $service = static::getContainer()->get('test.PaymentService');
 
         $method = 'paypal';
+        $price  = 12;
 
-        $result = $service->payment($method, 12);
+        $result = $service->payment($method, $price);
         $this->assertTrue($result);
     }
 

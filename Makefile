@@ -38,8 +38,11 @@ shell: ## php shell
 cache: ## php clear cache
 	${DC_PHP} php bin/console cache:clear
 
-test: ## tests
+test: ## Run all tests
 	${DC_PHP_NO_DEBUG} bin/phpunit tests
+
+test-cov: ## Run tests with HTML coverage
+	${DC_PHP} php -d xdebug.mode=coverage ./vendor/bin/phpunit tests --coverage-html var/coverage/ --coverage-cache var/cache/coverage/
 
 test-cache: ## php clear cache
 	${DC_PHP} rm -fr var/cache/test*
