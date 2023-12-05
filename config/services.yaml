@@ -35,3 +35,6 @@ services:
     App\Interface\PaymentInterface:
         class: App\Service\PaymentService
         arguments: ['@service_container']
+
+    App\Validator\ClientDataValidator:
+        arguments: ['@validator', '@service_container']

@@ -2,6 +2,8 @@
 
 namespace App\Tests\Functional\Service;
 
+use Exception;
+use LogicException;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
 class PaymentServiceTest extends KernelTestCase
@@ -14,7 +16,7 @@ class PaymentServiceTest extends KernelTestCase
 
         $method = 'test';
 
-        $this->expectException(\LogicException::class);
+        $this->expectException(LogicException::class);
         $this->expectExceptionMessage('Processor "test" not found.');
         $service->payment($method, 12);
     }
@@ -39,10 +41,9 @@ class PaymentServiceTest extends KernelTestCase
 
         $method = 'paypal';
 
-        $this->expectException(\Exception::class);
+        $this->expectException(Exception::class);
         $result = $service->payment($method, 10000001);
     }
-
 
     /**
      * @return array<string, array<int, float|bool>>
@@ -51,12 +52,15 @@ class PaymentServiceTest extends KernelTestCase
     {
         return [
             '120.0' => [120.0, true],
-            '80.1' => [80.1, false],
+            '80.1'  => [80.1, false],
         ];
     }
 
     /**
      * @dataProvider priceProvider
+     *
+     * @param float $price
+     * @param bool  $expected
      */
     public function testStripe(float $price, bool $expected): void
     {

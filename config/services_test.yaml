@@ -2,3 +2,7 @@ services:
   test.PaymentService:
     alias: 'App\Interface\PaymentInterface'
     public: true
+
+  test.Validator:
+    alias: 'App\Validator\ClientDataValidator'
+    public: true

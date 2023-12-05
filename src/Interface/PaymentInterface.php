@@ -8,7 +8,8 @@ interface PaymentInterface
 {
     /**
      * @param string $processor имя процессора для платежа
-     * @param mixed $price
+     * @param mixed  $price
+     *
      * @return bool
      */
     public function payment(string $processor, mixed $price): bool;

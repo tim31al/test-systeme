@@ -39,7 +39,7 @@ cache: ## php clear cache
 	${DC_PHP} php bin/console cache:clear
 
 test: ## tests
-	${DC_PHP_NO_DEBUG} bin/phpunit
+	${DC_PHP_NO_DEBUG} bin/phpunit tests
 
 test-cache: ## php clear cache
 	${DC_PHP} rm -fr var/cache/test*

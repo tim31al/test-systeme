@@ -5,10 +5,11 @@ declare(strict_types=1);
 namespace App\Service;
 
 use App\Interface\PaymentInterface;
+use Exception;
+use LogicException;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Systemeio\TestForCandidates\PaymentProcessor\PaypalPaymentProcessor;
 use Systemeio\TestForCandidates\PaymentProcessor\StripePaymentProcessor;
-
 
 class PaymentService implements PaymentInterface
 {
@@ -23,37 +24,44 @@ class PaymentService implements PaymentInterface
     }
 
     /**
-     * @throws \Exception
+     * @param string $processor
+     * @param mixed  $price
+     *
+     * @throws Exception
      */
     public function payment(string $processor, mixed $price): bool
     {
         if (!$this->support($processor)) {
-            throw new \LogicException(sprintf('Processor "%s" not found.', $processor));
+            throw new LogicException(sprintf('Processor "%s" not found.', $processor));
         }
 
         $runner = $this->container->get($processor);
 
         if ($runner instanceof PaypalPaymentProcessor) {
             if (!is_int($price)) {
-                throw new \LogicException(sprintf('Processor "%s" require int price.', $processor));
+                throw new LogicException(sprintf('Processor "%s" require int price.', $processor));
             }
 
             $runner->pay($price);
+
             return true;
         }
 
         if ($runner instanceof StripePaymentProcessor) {
             if (!is_float($price)) {
-                throw new \LogicException(sprintf('Processor "%s" require float price.', $processor));
+                throw new LogicException(sprintf('Processor "%s" require float price.', $processor));
             }
+
             return $runner->processPayment($price);
         }
 
-        throw new \LogicException('Code is unreachable.');
+        throw new LogicException('Code is unreachable.');
     }
 
     /**
      * Поддерживаемые типы процессоров.
+     *
+     * @param string $processor
      */
     private function support(string $processor): bool
     {
