@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Service;
 
 use App\Interface\PaymentInterface;
+use Exception;
 use LogicException;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Systemeio\TestForCandidates\PaymentProcessor\PaypalPaymentProcessor;
@@ -23,7 +24,10 @@ class PaymentService implements PaymentInterface
     }
 
     /**
-     * @throws \Exception
+     * @param string $processor
+     * @param float  $price
+     *
+     * @throws Exception
      */
     public function payment(string $processor, float $price): bool
     {
