@@ -1,0 +1,4 @@
+services:
+  test.PaymentService:
+    alias: 'App\Interface\PaymentInterface'
+    public: true

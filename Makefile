@@ -35,11 +35,15 @@ destroy: ## Docker stop and remove
 shell: ## php shell
 	${DC_PHP} bash
 
+cache: ## php clear cache
+	${DC_PHP} php bin/console cache:clear
+
 test: ## tests
 	${DC_PHP_NO_DEBUG} bin/phpunit
 
-cache: ## php clear cache
-	${DC_PHP} php bin/console cache:clear
+test-cache: ## php clear cache
+	${DC_PHP} rm -fr var/cache/test*
+	${DC_PHP} php bin/console cache:clear --env=test
 
 test-add: ## Добавить тест
 	${DC_PHP} php bin/console make:test
