@@ -2,7 +2,7 @@
 
 namespace App\Tests\Functional\Controller;
 
-use App\Tests\Helper\ApiTrait;
+use App\Tests\helper\ApiTrait;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 class PurchaseActionTest extends WebTestCase

@@ -26,7 +26,7 @@ down: ## Docker stop
 	${DOCKER_COMPOSE} down
 
 destroy: ## Docker stop and remove
-	${DOCKER_COMPOSE} down -v --rmi=all --remove-orphans
+	${DOCKER_COMPOSE} down -v --remove-orphans
 
 
 ##################
@@ -38,7 +38,9 @@ shell: ## php shell
 cache: ## php clear cache
 	${DC_PHP} php bin/console cache:clear
 
-test: ## Run all tests
+tests: test-init test-all ## Run test init and all tests
+
+test-all: ## Run all tests
 	${DC_PHP_NO_DEBUG} bin/phpunit tests
 
 test-cov: ## Run tests with HTML coverage
@@ -50,6 +52,20 @@ test-cache: ## php clear cache
 
 test-add: ## Добавить тест
 	${DC_PHP} php bin/console make:test
+
+test-init: test-db-drop test-db-create test-db-schema test-fixtures ## Test init db
+
+test-db-drop: ## Test drop database
+	${DC_PHP_NO_DEBUG} bin/console --env=test doctrine:database:drop --if-exists --force
+
+test-db-create: ## Test create database
+	${DC_PHP_NO_DEBUG} bin/console --env=test doctrine:database:create
+
+test-db-schema: ## Test schema create
+	${DC_PHP_NO_DEBUG} bin/console --env=test doctrine:schema:create -q
+
+test-fixtures: ## Test load fixtures
+	${DC_PHP_NO_DEBUG} bin/console --env=test doctrine:fixtures:load -q
 
 
 ##################

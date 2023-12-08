@@ -48,4 +48,5 @@ RUN curl -sS https://get.symfony.com/cli/installer | bash \
 # Install php extensions
 RUN docker-php-ext-install \
     intl \
-    opcache
+    opcache \
+    pdo_mysql

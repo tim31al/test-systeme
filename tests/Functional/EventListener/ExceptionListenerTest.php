@@ -2,7 +2,7 @@
 
 namespace App\Tests\Functional\EventListener;
 
-use App\Tests\Helper\ApiTrait;
+use App\Tests\helper\ApiTrait;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
