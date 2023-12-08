@@ -8,17 +8,17 @@ use App\Interface\ResponseDTOInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Serializer\Attribute\Groups;
 
-readonly class SuccessDTO implements ResponseDTOInterface
+readonly class PriceResponseDTO implements ResponseDTOInterface
 {
     public function __construct(
         #[Groups('api')]
-        private string $message,
+        private float $price,
         private int $code = Response::HTTP_OK
     ) {}
 
-    public function getMessage(): string
+    public function getPrice(): float
     {
-        return $this->message;
+        return $this->price;
     }
 
     public function getCode(): int

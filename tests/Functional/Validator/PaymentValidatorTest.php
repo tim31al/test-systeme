@@ -6,18 +6,18 @@ namespace App\Tests\Functional\Validator;
 
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
-class ClientDataValidatorTest extends KernelTestCase
+class PaymentValidatorTest extends KernelTestCase
 {
     public function testValidPrice(): void
     {
         self::bootKernel();
 
-        /** @var \App\Validator\ClientDataValidator $validator */
+        /** @var \App\Validator\PaymentValidator $validator */
         $validator = static::getContainer()->get('test.Validator');
 
         $data = [
             'product'    => 1,
-            'couponCode' => '123',
+            'couponCode' => 'P123',
             'taxNumber'  => 'DE123123123',
         ];
 
@@ -29,12 +29,12 @@ class ClientDataValidatorTest extends KernelTestCase
     {
         self::bootKernel();
 
-        /** @var \App\Validator\ClientDataValidator $validator */
+        /** @var \App\Validator\PaymentValidator $validator */
         $validator = static::getContainer()->get('test.Validator');
 
         $data = [
             'product'    => -1,
-            'couponCode' => '123',
+            'couponCode' => 'D123',
             'taxNumber'  => 'DE123123123',
         ];
 
@@ -49,7 +49,7 @@ class ClientDataValidatorTest extends KernelTestCase
     {
         self::bootKernel();
 
-        /** @var \App\Validator\ClientDataValidator $validator */
+        /** @var \App\Validator\PaymentValidator $validator */
         $validator = static::getContainer()->get('test.Validator');
 
         $data = null;
@@ -62,17 +62,35 @@ class ClientDataValidatorTest extends KernelTestCase
     {
         self::bootKernel();
 
-        /** @var \App\Validator\ClientDataValidator $validator */
+        /** @var \App\Validator\PaymentValidator $validator */
         $validator = static::getContainer()->get('test.Validator');
 
         $data = [
             'product'          => 1,
-            'couponCode'       => '123',
+            'couponCode'       => 'D12',
             'taxNumber'        => 'FRAZ123123123',
             'paymentProcessor' => 'paypal',
         ];
 
         $errors = $validator->validate($data, true);
         $this->assertCount(0, $errors);
+    }
+
+    public function testInvalidPurchase(): void
+    {
+        self::bootKernel();
+
+        /** @var \App\Validator\PaymentValidator $validator */
+        $validator = static::getContainer()->get('test.Validator');
+
+        $data = [
+            'product'          => 1,
+            'couponCode'       => '12',
+            'taxNumber'        => 'FRAZ123123123',
+            'paymentProcessor' => 'paypal',
+        ];
+
+        $errors = $validator->validate($data, true);
+        $this->assertCount(1, $errors);
     }
 }

@@ -4,48 +4,57 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\Service;
 
+use App\Service\PaymentService;
 use Exception;
 use LogicException;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
 class PaymentServiceTest extends KernelTestCase
 {
-    public function testThrowLogicException(): void
+    private PaymentService $service;
+
+    protected function setUp(): void
     {
+        parent::setUp();
+
         self::bootKernel();
 
-        $service = static::getContainer()->get('test.PaymentService');
+        $this->service = static::getContainer()->get('test.PaymentService');
+    }
 
+    /**
+     * @throws \App\Exception\PaymentException
+     */
+    public function testThrowLogicException(): void
+    {
         $method = 'test';
 
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage('Processor "test" not found.');
-        $service->payment($method, 12);
+        $this->service->payment($method, 12);
     }
 
+    /**
+     * @throws \App\Exception\PaymentException
+     */
     public function testPaypal(): void
     {
-        self::bootKernel();
-
-        $service = static::getContainer()->get('test.PaymentService');
-
         $method = 'paypal';
         $price  = 12;
 
-        $result = $service->payment($method, $price);
+        $result = $this->service->payment($method, $price);
         $this->assertTrue($result);
     }
 
+    /**
+     * @throws \App\Exception\PaymentException
+     */
     public function testPaypalExpectException(): void
     {
-        self::bootKernel();
-
-        $service = static::getContainer()->get('test.PaymentService');
-
         $method = 'paypal';
 
         $this->expectException(Exception::class);
-        $result = $service->payment($method, 10000001);
+        $result = $this->service->payment($method, 10000001);
     }
 
     /**
@@ -64,16 +73,14 @@ class PaymentServiceTest extends KernelTestCase
      *
      * @param float $price
      * @param bool  $expected
+     *
+     * @throws \App\Exception\PaymentException
      */
     public function testStripe(float $price, bool $expected): void
     {
-        self::bootKernel();
-
-        $service = static::getContainer()->get('test.PaymentService');
-
         $method = 'stripe';
 
-        $result = $service->payment($method, $price);
+        $result = $this->service->payment($method, $price);
         $this->assertSame($expected, $result);
     }
 }

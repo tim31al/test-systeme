@@ -34,7 +34,7 @@ class PriceServiceTest extends TestCase
         $dto = new PriceDTO(100, $countryCode);
 
         $service = new PriceService();
-        $sum     = $service->process($dto);
+        $sum     = $service->calculate($dto);
 
         $this->assertSame($expected, $sum);
     }
@@ -43,7 +43,7 @@ class PriceServiceTest extends TestCase
     {
         $dto     = new PriceDTO(100, 'GR', null, 6);
         $service = new PriceService();
-        $sum     = $service->process($dto);
+        $sum     = $service->calculate($dto);
 
         $this->assertSame(116.56, $sum);
     }

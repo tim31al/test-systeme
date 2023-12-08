@@ -12,6 +12,8 @@ interface PaymentInterface
      * @param string $processor имя процессора для платежа
      * @param float  $price     цена продукта
      *
+     * @throws \App\Exception\PaymentException
+     *
      * @return bool
      */
     public function payment(string $processor, float $price): bool;

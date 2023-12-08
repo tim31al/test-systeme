@@ -22,7 +22,7 @@ class PriceService
      *
      * @return float
      */
-    public function process(PriceDTO $dto): float
+    public function calculate(PriceDTO $dto): float
     {
         $price = (float) $dto->getPrice();
 

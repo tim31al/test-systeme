@@ -4,5 +4,5 @@ services:
     public: true
 
   test.Validator:
-    alias: 'App\Validator\ClientDataValidator'
+    alias: 'App\Validator\PaymentValidator'
     public: true

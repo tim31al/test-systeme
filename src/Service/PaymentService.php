@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Service;
 
+use App\Exception\PaymentException;
 use App\Interface\PaymentInterface;
 use Exception;
 use LogicException;
@@ -23,12 +24,6 @@ class PaymentService implements PaymentInterface
         $this->processors = (array) $this->container->getParameter('app.payment_processors');
     }
 
-    /**
-     * @param string $processor
-     * @param float  $price
-     *
-     * @throws Exception
-     */
     public function payment(string $processor, float $price): bool
     {
         if (!$this->support($processor)) {
@@ -40,7 +35,11 @@ class PaymentService implements PaymentInterface
         if ($runner instanceof PaypalPaymentProcessor) {
             $price = (int) ($price * 100);
 
-            $runner->pay($price);
+            try {
+                $runner->pay($price);
+            } catch (Exception $e) {
+                throw new PaymentException($e->getMessage());
+            }
 
             return true;
         }
