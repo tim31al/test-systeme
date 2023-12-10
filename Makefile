@@ -16,7 +16,9 @@ help: ## Show this help
 ##################
 build: mk_volume docker_build ## Docker build
 
-up: ## Docker up
+up: mk_volume up-services ## Docker up
+
+up-services:
 	${DOCKER_COMPOSE} up -d
 
 logs: ## Docker logs

@@ -13,8 +13,6 @@ services:
       MYSQL_PASSWORD: user
       MYSQL_DATABASE: app
     user: ${PUID}:${PGID}
-    ports:
-      - "3333:3306"
     volumes:
       - data_test_payments:/var/lib/mysql
 
@@ -42,12 +40,12 @@ services:
         - USER=${PUSER}
         - GROUP=${PGROUP}
         - INSTALL_XDEBUG=${INSTALL_XDEBUG}
+        - HTTP_PROXY=${HTTP_PROXY}
     environment:
       PHP_IDE_CONFIG: "serverName=DebugTestPayments"
     depends_on: [db]
     volumes:
       - ./:/var/www
-#      - ./docker/php-fpm8.2/xdebug.ini:/usr/local/etc/php/conf.d/xdebug.ini
       - sock_test_payments:/var/run
 
 volumes:

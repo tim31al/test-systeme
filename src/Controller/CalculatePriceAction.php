@@ -10,6 +10,9 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Attribute\Route;
 
+/**
+ * Узнать цену.
+ */
 class CalculatePriceAction extends AbstractController
 {
     public function __construct(private readonly PaymentSystem $service) {}

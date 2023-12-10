@@ -48,9 +48,11 @@ RUN docker-php-ext-install \
 ARG INSTALL_XDEBUG=false
 ARG HTTP_PROXY=false
 
-RUN if [ ${HTTP_PROXY} != false ]; then pear config-set http_proxy ${HTTP_PROXY}; fi
-
-RUN if [ ${INSTALL_XDEBUG} = true ]; then pecl install xdebug; fi;
+RUN if [ ${INSTALL_XDEBUG} = true ]; \
+    then \
+      if [ ${HTTP_PROXY} != false ]; then pear config-set http_proxy ${HTTP_PROXY}; fi; \
+      pecl install xdebug; \
+    fi;
 
 COPY xdebug.ini /usr/local/etc/php/conf.d/xdebug.ini
 

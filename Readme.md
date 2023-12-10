@@ -29,4 +29,8 @@
             "paymentProcessor": "paypal"
         }'
     ```
+3. Список продуктов
+   ```bash 
+   curl --location 'http://localhost:80/products'
+   ```
    
