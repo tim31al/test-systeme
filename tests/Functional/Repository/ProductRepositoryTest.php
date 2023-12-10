@@ -4,10 +4,13 @@ namespace App\Tests\Functional\Repository;
 
 use App\Entity\Product;
 use App\Repository\ProductRepository;
+use App\Tests\helper\FunctionalTrait;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
 class ProductRepositoryTest extends KernelTestCase
 {
+    use FunctionalTrait;
+
     private ProductRepository $repository;
 
     protected function setUp(): void
@@ -16,14 +19,8 @@ class ProductRepositoryTest extends KernelTestCase
 
         self::bootKernel();
 
-        $repository = static::getContainer()->get(ProductRepository::class);
-        if (!$repository instanceof ProductRepository) {
-            throw new \LogicException('ProductRepository not found.');
-        }
-
-        $this->repository = $repository;
+        $this->repository = $this->getProductRepository();
     }
-
 
     public function testFindAll(): void
     {

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Interface;
 
-interface PaymentInterface
+interface PurchaseInterface
 {
     /**
      * Оплата товара.
@@ -14,7 +14,7 @@ interface PaymentInterface
      *
      * @throws \App\Exception\PaymentException
      *
-     * @return bool
+     * @return void
      */
-    public function payment(string $processor, float $price): bool;
+    public function payment(string $processor, float $price): void;
 }

@@ -8,7 +8,7 @@ use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
 class PaymentValidatorTest extends KernelTestCase
 {
-    public function testValidPrice(): void
+    public function testValidPriceWithCoupon(): void
     {
         self::bootKernel();
 
@@ -19,6 +19,22 @@ class PaymentValidatorTest extends KernelTestCase
             'product'    => 1,
             'couponCode' => 'P123',
             'taxNumber'  => 'DE123123123',
+        ];
+
+        $errors = $validator->validate($data);
+        $this->assertCount(0, $errors);
+    }
+
+    public function testValidPriceWithout(): void
+    {
+        self::bootKernel();
+
+        /** @var \App\Validator\PaymentValidator $validator */
+        $validator = static::getContainer()->get('test.Validator');
+
+        $data = [
+            'product'   => 1,
+            'taxNumber' => 'DE123123123',
         ];
 
         $errors = $validator->validate($data);

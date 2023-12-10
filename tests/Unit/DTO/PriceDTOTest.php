@@ -15,6 +15,6 @@ class PriceDTOTest extends TestCase
         $this->expectException(LogicException::class);
         $this->expectExceptionMessage('Country code "de" not support.');
 
-        $dto = new PriceDTO(100, 'de');
+        $dto = new PriceDTO(100, 'de', 100, false);
     }
 }

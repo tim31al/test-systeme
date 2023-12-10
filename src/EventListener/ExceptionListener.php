@@ -24,18 +24,14 @@ readonly class ExceptionListener
         $exception = $event->getThrowable();
 
         if (!$exception instanceof LoggedException) {
-            $this->logger->error($exception->getMessage(), [
-                'file' => $exception->getFile(),
-                'line' => $exception->getLine(),
-            ]);
+            $this->logger->error($exception);
 
             $status = Response::HTTP_INTERNAL_SERVER_ERROR;
         } else {
             $status = Response::HTTP_BAD_REQUEST;
         }
 
-        $data     = ['error' => $exception->getMessage()];
-        $response = new JsonResponse($data, $status);
+        $response = new JsonResponse(['errors' => [$exception->getMessage()]], $status);
 
         $event->setResponse($response);
     }

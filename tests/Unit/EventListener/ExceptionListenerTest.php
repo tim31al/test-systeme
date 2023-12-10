@@ -13,11 +13,6 @@ use Symfony\Component\HttpKernel\KernelInterface;
 
 class ExceptionListenerTest extends TestCase
 {
-    public function testSomething(): void
-    {
-        $this->assertTrue(true);
-    }
-
     public function testHandleNotLoggedException(): void
     {
         $exception = new Exception('Test');
@@ -26,7 +21,7 @@ class ExceptionListenerTest extends TestCase
         $logger
             ->expects(self::once())
             ->method('error')
-            ->with('Test');
+            ->with($exception);
 
         $kernel  = $this->createMock(KernelInterface::class);
         $request = $this->createMock(Request::class);
@@ -62,6 +57,7 @@ class ExceptionListenerTest extends TestCase
 
         $data = json_decode($event->getResponse()->getContent(), true);
 
-        $this->assertSame('Logged exception message.', $data['error']);
+        $this->assertIsArray($data['errors']);
+        $this->assertSame('Logged exception message.', $data['errors'][0]);
     }
 }

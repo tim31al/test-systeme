@@ -8,16 +8,23 @@ use App\DTO\BadRequestDTO;
 use App\DTO\PriceDTO;
 use App\DTO\PriceResponseDTO;
 use App\DTO\SuccessDTO;
+use App\Entity\Product;
 use App\Exception\LoggedException;
 use App\Exception\PaymentException;
-use App\Interface\PaymentInterface;
+use App\Interface\PurchaseInterface;
 use App\Interface\ResponseDTOInterface;
+use App\Repository\ProductRepository;
 use App\Validator\PaymentValidator;
 use Exception;
+use LogicException;
 use Psr\Log\LoggerInterface;
-use Symfony\Component\HttpFoundation\Response;
-use Throwable;
 
+/**
+ * Платежная система.
+ * Возможности:
+ *  - узнать цену;
+ *  - провести платеж.
+ */
 readonly class PaymentSystem
 {
     public const KEY_PRODUCT           = 'product';
@@ -25,99 +32,92 @@ readonly class PaymentSystem
     public const KEY_COUPON_CODE       = 'couponCode';
     public const KEY_PAYMENT_PROCESSOR = 'paymentProcessor';
 
-    private const DEFAULT_ERROR_MESSAGE = 'Internal Server Error.';
+    /**
+     * Узнать цену.
+     */
+    public const METHOD_PRICE = 'price';
+
+    /**
+     * Платеж.
+     */
+    public const METHOD_PAY = 'pay';
 
     public function __construct(
         private PaymentValidator $validator,
-        private PaymentInterface $paymentService,
+        private PurchaseInterface $paymentService,
         private PriceService $priceService,
-        private LoggerInterface $logger
+        private LoggerInterface $logger,
+        private ProductRepository $repository,
     ) {}
 
     /**
-     * Получить цену продукта.
-     *
-     * @param array<string, mixed>|null $data
-     *
-     * @throws Throwable
-     *
-     * @return \App\Interface\ResponseDTOInterface
-     */
-    public function getPrice(?array $data): ResponseDTOInterface
-    {
-        try {
-            $errors = $this->validator->validate($data);
-            if (0 !== count($errors)) {
-                return new BadRequestDTO($errors);
-            }
-
-            $price = $this->calculatePrice($data);
-
-            return new PriceResponseDTO($price);
-        } catch (Throwable $e) {
-            $this->logError($e);
-
-            throw new LoggedException(self::DEFAULT_ERROR_MESSAGE, Response::HTTP_BAD_REQUEST);
-        }
-    }
-
-    /**
-     * Покупка товара.
-     *
-     * @param array<string, mixed>|null $data
+     * @param ?array $data
+     * @param string $method
      *
      * @throws \App\Exception\LoggedException
-     *
-     * @return \App\Interface\ResponseDTOInterface
      */
-    public function pay(?array $data): ResponseDTOInterface
+    public function process(?array $data, string $method): ResponseDTOInterface
     {
+        if (!in_array($method, [self::METHOD_PAY, self::METHOD_PRICE])) {
+            throw new LogicException('Method not allowed.');
+        }
+
         try {
-            $errors = $this->validator->validate($data, true);
+            $errors = $this->validator->validate($data, self::METHOD_PAY === $method);
             if (0 !== count($errors)) {
                 return new BadRequestDTO($errors);
             }
 
-            $price = $this->calculatePrice($data);
-
-            $isPay = $this->paymentService->payment($data[self::KEY_PAYMENT_PROCESSOR], $price);
-
-            if ($isPay) {
-                return new SuccessDTO('Success.');
+            $product = $this->repository->find($data[self::KEY_PRODUCT]);
+            if (!$product instanceof Product) {
+                return new BadRequestDTO([sprintf('Product #%d not found.', $data[self::KEY_PRODUCT])]);
             }
 
-            throw new PaymentException('Operation not success.');
+            $price = $this->calculatePrice($product->getPrice(), $data);
+            if (0 > $price) {
+                return new BadRequestDTO([sprintf('Price (%d) cannot be less than zero.', $price)]);
+            }
+
+            // получить цену
+            if (self::METHOD_PRICE === $method) {
+                return new PriceResponseDTO($price);
+            }
+
+            // совершить платеж
+            $this->paymentService->payment($data[self::KEY_PAYMENT_PROCESSOR], $price);
+
+            return new SuccessDTO('Success.');
         } catch (Exception $e) {
-            $this->logError($e);
-            $message = $e instanceof PaymentException ? $e->getMessage() : self::DEFAULT_ERROR_MESSAGE;
+            $this->logger->error($e);
+
+            $message = $e instanceof PaymentException ? $e->getMessage() : 'Internal Server Error.';
 
             throw new LoggedException($message);
         }
     }
 
     /**
+     * Получить цену продукта.
+     *
+     * @param int                       $price
      * @param array<string, int|string> $data
      *
      * @return float
      */
-    private function calculatePrice(array $data): float
+    private function calculatePrice(int $price, array $data): float
     {
         $countryCode = substr($data[self::KEY_TAX_NUMBER], 0, 2);
 
-        $dto = new PriceDTO(100, $countryCode);
+        if (array_key_exists(self::KEY_COUPON_CODE, $data)) {
+            $discount  = (int) substr($data[self::KEY_COUPON_CODE], 1);
+            $isPercent = str_starts_with($data[self::KEY_COUPON_CODE], 'P');
+        } else {
+            $discount  = null;
+            $isPercent = false;
+        }
+
+        $dto = new PriceDTO($price, $countryCode, $discount, $isPercent);
 
         return $this->priceService->calculate($dto);
-    }
-
-    /**
-     * Лог ошибок.
-     *
-     * @param Throwable $e
-     *
-     * @return void
-     */
-    private function logError(Throwable $e): void
-    {
-        $this->logger->error($e->getMessage(), ['file' => $e->getFile(), 'line' => $e->getLine()]);
     }
 }

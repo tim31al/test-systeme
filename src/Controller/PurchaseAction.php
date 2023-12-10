@@ -14,11 +14,14 @@ class PurchaseAction extends AbstractController
 {
     public function __construct(private readonly PaymentSystem $service) {}
 
+    /**
+     * @throws \App\Exception\LoggedException
+     */
     #[Route(path: '/purchase', name: 'purchase', methods: 'POST')]
     public function __invoke(Request $request): JsonResponse
     {
         $data = $request->request->all();
-        $dto  = $this->service->pay($data);
+        $dto  = $this->service->process($data, PaymentSystem::METHOD_PAY);
 
         return $this->json($dto, $dto->getCode(), [], ['groups' => 'api']);
     }

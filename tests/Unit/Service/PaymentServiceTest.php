@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Unit\Service;
 
-use App\Service\PaymentService;
+use App\Service\PurchaseService;
 use Exception;
 use LogicException;
 use PHPUnit\Framework\TestCase;
@@ -32,7 +32,7 @@ class PaymentServiceTest extends TestCase
             ->with('paypal')
             ->willReturn(new stdClass());
 
-        $service = new PaymentService($container);
+        $service = new PurchaseService($container);
 
         $this->expectException(LogicException::class);
         $service->payment('paypal', 100.1);
@@ -78,7 +78,7 @@ class PaymentServiceTest extends TestCase
             ->with('paypal')
             ->willReturn($paypal);
 
-        $service = new PaymentService($container);
+        $service = new PurchaseService($container);
 
         $service->payment('paypal', $price);
     }

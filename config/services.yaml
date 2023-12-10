@@ -32,8 +32,8 @@ services:
         class: 'Systemeio\TestForCandidates\PaymentProcessor\StripePaymentProcessor'
         public: true
 
-    App\Interface\PaymentInterface:
-        class: App\Service\PaymentService
+    App\Interface\PurchaseInterface:
+        class: App\Service\PurchaseService
         arguments: ['@service_container']
 
     App\Validator\PaymentValidator:

@@ -47,10 +47,12 @@ services:
     depends_on: [db]
     volumes:
       - ./:/var/www
-      - ./docker/php-fpm8.2/xdebug.ini:/usr/local/etc/php/conf.d/xdebug.ini
+#      - ./docker/php-fpm8.2/xdebug.ini:/usr/local/etc/php/conf.d/xdebug.ini
       - sock_test_payments:/var/run
 
 volumes:
   sock_test_payments:
   data_test_payments:
+    external: true
+
 

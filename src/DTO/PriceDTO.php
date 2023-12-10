@@ -12,8 +12,8 @@ readonly class PriceDTO
     public function __construct(
         private int $price,
         private string $countryCode,
-        private ?int $discount = null,
-        private ?int $discountPercent = null
+        private ?int $discount,
+        private bool $isPercent
     ) {
         if (!array_key_exists($this->countryCode, PriceService::COUNTRY_TAX)) {
             throw new LogicException(sprintf('Country code "%s" not support.', $this->countryCode));
@@ -30,14 +30,13 @@ readonly class PriceDTO
         return $this->countryCode;
     }
 
-    // TODO: выяснить применяется ли?
     public function getDiscount(): ?int
     {
         return $this->discount;
     }
 
-    public function getDiscountPercent(): ?int
+    public function isPercent(): bool
     {
-        return $this->discountPercent;
+        return $this->isPercent;
     }
 }

@@ -5,6 +5,7 @@
 DOCKER_COMPOSE = docker compose
 DC_PHP = ${DOCKER_COMPOSE} exec -u app app
 DC_PHP_NO_DEBUG = ${DC_PHP} php -d xdebug.mode=debug
+DB_VOLUME = data_test_payments
 
 help: ## Show this help
 	@printf "\033[33m%s:\033[0m\n" 'Available commands'
@@ -13,8 +14,7 @@ help: ## Show this help
 ##################
 # Docker compose
 ##################
-build: ## Docker build
-	${DOCKER_COMPOSE} build
+build: mk_volume docker_build ## Docker build
 
 up: ## Docker up
 	${DOCKER_COMPOSE} up -d
@@ -28,10 +28,26 @@ down: ## Docker stop
 destroy: ## Docker stop and remove
 	${DOCKER_COMPOSE} down -v --remove-orphans
 
+mk_volume: ## Create db_volume
+	docker volume inspect ${DB_VOLUME} > /dev/null 2>&1 || docker volume create ${DB_VOLUME}
+
+rm_volume: ## Remove db_volume
+	docker volume rm ${DB_VOLUME}
+
+docker_build:
+	${DOCKER_COMPOSE} build
+
 
 ##################
 # App
 ##################
+init: ## Load fixtures
+	${DC_PHP_NO_DEBUG} bin/console doctrine:migrations:migrate -q
+	${DC_PHP_NO_DEBUG} bin/console app:load-fixtures
+
+install: ## Composer install
+	${DC_PHP} composer install
+
 shell: ## php shell
 	${DC_PHP} bash
 
@@ -65,7 +81,7 @@ test-db-schema: ## Test schema create
 	${DC_PHP_NO_DEBUG} bin/console --env=test doctrine:schema:create -q
 
 test-fixtures: ## Test load fixtures
-	${DC_PHP_NO_DEBUG} bin/console --env=test doctrine:fixtures:load -q
+	${DC_PHP_NO_DEBUG} bin/console --env=test app:load-fixtures -q
 
 
 ##################

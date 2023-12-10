@@ -1,6 +1,6 @@
 services:
-  test.PaymentService:
-    alias: 'App\Interface\PaymentInterface'
+  test.PurchaseService:
+    alias: 'App\Interface\PurchaseInterface'
     public: true
 
   test.Validator:

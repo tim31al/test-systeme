@@ -12,13 +12,6 @@ RUN apk add --update --no-cache \
     linux-headers \
     icu-dev
 
-# Xdebug
-ARG INSTALL_XDEBUG=false
-RUN if [ ${INSTALL_XDEBUG} = true ]; \
-    then \
-      pecl install xdebug; \
-    fi;
-
 # Configure non-root user.
 ARG UID
 ARG GID
@@ -50,3 +43,15 @@ RUN docker-php-ext-install \
     intl \
     opcache \
     pdo_mysql
+
+# Xdebug
+ARG INSTALL_XDEBUG=false
+ARG HTTP_PROXY=false
+
+RUN if [ ${HTTP_PROXY} != false ]; then pear config-set http_proxy ${HTTP_PROXY}; fi
+
+RUN if [ ${INSTALL_XDEBUG} = true ]; then pecl install xdebug; fi;
+
+COPY xdebug.ini /usr/local/etc/php/conf.d/xdebug.ini
+
+RUN if [ ${INSTALL_XDEBUG} != true ]; then rm /usr/local/etc/php/conf.d/xdebug.ini; fi

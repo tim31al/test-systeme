@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace App\Tests\Functional\Service;
 
-use App\Service\PaymentService;
-use Exception;
+use App\Exception\PaymentException;
+use App\Service\PurchaseService;
 use LogicException;
 use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 
 class PaymentServiceTest extends KernelTestCase
 {
-    private PaymentService $service;
+    private PurchaseService $service;
 
     protected function setUp(): void
     {
@@ -19,7 +19,7 @@ class PaymentServiceTest extends KernelTestCase
 
         self::bootKernel();
 
-        $this->service = static::getContainer()->get('test.PaymentService');
+        $this->service = static::getContainer()->get('test.PurchaseService');
     }
 
     /**
@@ -34,27 +34,28 @@ class PaymentServiceTest extends KernelTestCase
         $this->service->payment($method, 12);
     }
 
-    /**
-     * @throws \App\Exception\PaymentException
-     */
     public function testPaypal(): void
     {
         $method = 'paypal';
         $price  = 12;
 
-        $result = $this->service->payment($method, $price);
-        $this->assertTrue($result);
+        $isSuccess = true;
+
+        try {
+            $this->service->payment($method, $price);
+        } catch (PaymentException $e) {
+            $isSuccess = false;
+        }
+
+        $this->assertTrue($isSuccess);
     }
 
-    /**
-     * @throws \App\Exception\PaymentException
-     */
     public function testPaypalExpectException(): void
     {
         $method = 'paypal';
 
-        $this->expectException(Exception::class);
-        $result = $this->service->payment($method, 10000001);
+        $this->expectException(PaymentException::class);
+        $this->service->payment($method, 10000001);
     }
 
     /**
@@ -73,14 +74,19 @@ class PaymentServiceTest extends KernelTestCase
      *
      * @param float $price
      * @param bool  $expected
-     *
-     * @throws \App\Exception\PaymentException
      */
     public function testStripe(float $price, bool $expected): void
     {
         $method = 'stripe';
 
-        $result = $this->service->payment($method, $price);
-        $this->assertSame($expected, $result);
+        $isSuccess = true;
+
+        try {
+            $this->service->payment($method, $price);
+        } catch (PaymentException $exception) {
+            $isSuccess = false;
+        }
+
+        $this->assertSame($expected, $isSuccess);
     }
 }

@@ -31,7 +31,7 @@ class PriceServiceTest extends TestCase
      */
     public function testNalog(string $countryCode, float $expected): void
     {
-        $dto = new PriceDTO(100, $countryCode);
+        $dto = new PriceDTO(100, $countryCode, 0, false);
 
         $service = new PriceService();
         $sum     = $service->calculate($dto);
@@ -41,7 +41,7 @@ class PriceServiceTest extends TestCase
 
     public function testPriceWithDiscount(): void
     {
-        $dto     = new PriceDTO(100, 'GR', null, 6);
+        $dto     = new PriceDTO(100, 'GR', 6, true);
         $service = new PriceService();
         $sum     = $service->calculate($dto);
 

@@ -26,10 +26,11 @@ class PriceService
     {
         $price = (float) $dto->getPrice();
 
-        if (null !== $dto->getDiscountPercent()) {
-            $price = $price - $this->getPercent($price, $dto->getDiscountPercent());
+        if (null !== $dto->getDiscount()) {
+            $price -= $dto->isPercent() ? $this->getPercent($price, $dto->getDiscount()) : $dto->getDiscount();
         }
 
+        // цена со скидкой + налог
         return $price + $this->getPercent($price, self::COUNTRY_TAX[$dto->getCountryCode()]);
     }
 
