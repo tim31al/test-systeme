@@ -41,7 +41,9 @@ docker_build:
 ##################
 # App
 ##################
-init: ## Load fixtures
+init: install db_init ## Инициализация приложения
+
+db_init: ## Load fixtures
 	${DC_PHP_NO_DEBUG} bin/console doctrine:migrations:migrate -q
 	${DC_PHP_NO_DEBUG} bin/console app:load-fixtures
 

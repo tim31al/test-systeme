@@ -3,8 +3,8 @@
 namespace App\Tests\Functional\Command;
 
 use App\Tests\helper\FunctionalTrait;
-use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Bundle\FrameworkBundle\Console\Application;
+use Symfony\Bundle\FrameworkBundle\Test\KernelTestCase;
 use Symfony\Component\Console\Tester\CommandTester;
 
 class LoadFixturesCommandTest extends KernelTestCase
@@ -19,11 +19,11 @@ class LoadFixturesCommandTest extends KernelTestCase
         foreach ($products as $product) {
             $this->getEntityManager()->remove($product);
         }
-        $this->getEntityManager()->flush();;
+        $this->getEntityManager()->flush();
 
         $application = new Application(self::$kernel);
 
-        $command = $application->find('app:load-fixtures');
+        $command       = $application->find('app:load-fixtures');
         $commandTester = new CommandTester($command);
         $commandTester->execute([]);
 
